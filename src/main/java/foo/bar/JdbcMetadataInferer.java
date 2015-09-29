@@ -10,6 +10,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hsqldb.Server;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -123,11 +124,12 @@ class QueryMetadata {
 
 	@Override
 	public String toString() {
-		return "QueryMetadata(" + "\nnParams: " + nParams + "\nparamTypes: " + Arrays.toString(paramTypes)
-		        + "\nparamClasses: " + Arrays.toString(paramClassNames)
-				+ "\nnResults: " + nResults + "\nresultTypes: " + Arrays.toString(resultTypes) + "\nresultClassNames: "
-				+ Arrays.toString(resultClassNames) + "\nresultNames: "
-				+ Arrays.toString(resultNames) + "\ntableNames: " + Arrays.toString(tableNames) + "\n)";
+		return  ToStringBuilder.reflectionToString(this);
+//		return "QueryMetadata(" + "\nnParams: " + nParams + "\nparamTypes: " + Arrays.toString(paramTypes)
+//		        + "\nparamClasses: " + Arrays.toString(paramClassNames)
+//				+ "\nnResults: " + nResults + "\nresultTypes: " + Arrays.toString(resultTypes) + "\nresultClassNames: "
+//				+ Arrays.toString(resultClassNames) + "\nresultNames: "
+//				+ Arrays.toString(resultNames) + "\ntableNames: " + Arrays.toString(tableNames) + "\n)";
 	}
 
 }

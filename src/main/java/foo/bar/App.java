@@ -6,7 +6,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.text.StrSubstitutor;
 
 import foo.bar.queries.Query1;
 import javaslang.*;
@@ -232,6 +236,8 @@ public class App {
 				String preparedQuery = query.replaceAll("\\{[^\\}]*\\}", "?"); 
 				PreparedStatement ps = connection.prepareStatement(preparedQuery);
 				
+			//Map<String, String> valuesMap = new HashMap<>();
+				
 				// FIXME, FIXME, FIXME, assumed params in order...
 				for (int i = 0; i < parameters.size(); i++) {
 					// fuck, to string ....
@@ -250,6 +256,7 @@ public class App {
 					}
 					//preparedQuery = preparedQuery.replaceFirst("\\{" + parameters.get(i).getName() +"\\}", args[i]);
 				}
+				//StrSubstitutor.replace(source, valueMap); wait, no point :(
 				
 				ResultSet rs = ps.executeQuery();
 				Class<?> resultClass = getResultClass(metadata, parameters);
