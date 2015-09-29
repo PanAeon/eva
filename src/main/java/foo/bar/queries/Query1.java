@@ -23,4 +23,12 @@ import java.util.List;
  */
 public interface Query1<R> {
 	public List<R> result(); // Actually Seq....
+	// public R single();
+	// public R singleOption();
+	// public R singleOrNull();
+	// count
+	// 
+	// ??? drop, filter ? map, flatMap, take ... 
 }
+
+// TODO: Tuple<Optional<Something> and I'm not sure about Tuple<@Nullable something>
