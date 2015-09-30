@@ -23,9 +23,9 @@ import java.util.List;
  */
 public interface Query1<R> {
 	public List<R> result(); // Actually Seq....
-	// public R single();
+	
+	// public R single(); // or null
 	// public R singleOption();
-	// public R singleOrNull();
 	// count
 	// 
 	// ??? drop, filter ? map, flatMap, take ... 

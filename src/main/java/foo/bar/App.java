@@ -7,11 +7,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.text.StrSubstitutor;
 
+import foo.bar.expression.ExpressionNode;
+import foo.bar.expression.TextNode;
+import foo.bar.expression.VariableNode;
+import foo.bar.expression.parser.ExpressionParser;
+import foo.bar.expression.parser.ParseResult;
 import foo.bar.queries.Query1;
 import javaslang.*;
 import net.bytebuddy.ByteBuddy;
@@ -24,6 +32,8 @@ import net.bytebuddy.description.method.ParameterDescription;
 import net.bytebuddy.description.method.ParameterList;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.description.type.TypeDescription.ForLoadedType;
+import net.bytebuddy.dynamic.DynamicType.Builder.MethodAnnotationTarget;
+import net.bytebuddy.dynamic.DynamicType.Builder.OptionalMatchedMethodInterception;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.FixedValue;
 import net.bytebuddy.implementation.MethodDelegation;
@@ -32,87 +42,19 @@ import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.This;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
+
+// TODO: batch statements
+//todo: support positional params (?) do we need them?
+// TODO: support subqueries, ...
 public class App {
 	public static void main(String[] args) throws Exception {
 		new App()._main();
 	}
-
-	public Class<? extends Object> getTypeInfo(Class<?> _class) throws Exception {
-		ForLoadedType description = new TypeDescription.ForLoadedType(_class);
-		// AnnotationList declaredAnnotations =
-		// description.getDeclaredAnnotations();
-		MethodList<InDefinedShape> declaredMethods = description.getDeclaredMethods();
-		MethodList<InDefinedShape> sqlMethods = declaredMethods.filter(isAnnotatedWith(sql.class));
-		for (InDefinedShape m : sqlMethods) {
-			AnnotationList methodAnnotations = m.getDeclaredAnnotations();
-			// methodAnnotations.forEach(x ->
-			// System.out.println(x.getAnnotationType().getName()));
-			AnnotationDescription sqlAnnotation = methodAnnotations.stream()
-					.filter(x -> x.getAnnotationType().getName().equals("foo.bar.sql")).findFirst().get();
-			// sqlAnnotation.getAnnotationType().findVariable(symbol)
-			InDefinedShape valueMethod = sqlAnnotation.getAnnotationType().getDeclaredMethods().filter(named("value"))
-					.get(0);
-			String sqlQuery = (String) sqlAnnotation.getValue(valueMethod);
-
-			// TypeInferer.infereTypes(query);
-
-			// Prepare query (strip named params)
-
-			ParameterList<ParameterDescription.InDefinedShape> parameters = m.getParameters();
-
-			QueryMetadata metadata = JdbcMetadataInferer.infereMetadata(sqlQuery.replaceAll("\\{[^\\}]*\\}", "?"));
-			System.out.println(metadata);
-
-			 // +
-																							// params!
-			
-//			Query1<Tuple5<Integer, String, String, String,String>> foo = ((Query1<Tuple5<Integer, String, String, String,String>>)compiledQuery);
-			
-			
-//			Object compiledQuery1 = 
-//					 new Query1<Tuple5<Integer, String, String, String,String>>() {
-//					 public Tuple5<Integer, String, String, String, String> result() {
-//					 return null;
-//					 }
-//					 };
-			// switch(metadata.nResults) {
-			// case 5:
-			// arity, how to construct arity?
-			// compiledQuery = new Query0<Tuple5<Integer, String, String,
-			// String, String>>() {
-			// public Tuple5<Integer, String, String, String, String> result()
-			// {
-			// return null;
-			// }
-			// }; // should construct this at runtime somehow(
-			// break;
-			// default:
-			// throw new RuntimeException("not implemented(");
-			// }
-
-			// todo: it's wrong to use fixed value when method takes params!
-			// fixed value
-
-			Class<?> dynamicType = 
-					new ByteBuddy()
-					.subclass(Object.class)
-					.implement(_class)
-					.defineMethod(m)
-					.intercept(MethodDelegation.to(new QueryInterceptor(sqlQuery, metadata, parameters))) // fixed value
-																// also takes
-																// type
-																// description
-																// ...
-					.make().load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
-			return dynamicType;
-		}
-		throw new RuntimeException("not implemented");
-	}
-
+	
 	public void _main() throws Exception {
 		Class<?> myType = getTypeInfo(Genesys.class);
 		Genesys instance = (Genesys) myType.newInstance();
-		System.out.println(instance.userQ().result());
+		System.out.println(instance.getUserWithOrg(1).result());
 		// Class<?> dynamicType = new ByteBuddy()
 		// .subclass(Object.class)
 		// .implement(Genesys.class)
@@ -129,13 +71,66 @@ public class App {
 		// System.out.println(instance.userQ(3));
 	}
 
-	public static class SqlTarget {
-		public static int intercept(@AllArguments Object[] arguments, @This Object _this) {
-			return 3;
+//	public static class SqlTarget {
+//		public static int intercept(@AllArguments Object[] arguments, @This Object _this) {
+//			return 3;
+//		}
+//	}
+
+	public Class<? extends Object> getTypeInfo(Class<?> _class) throws Exception {
+		ForLoadedType description = new TypeDescription.ForLoadedType(_class);
+		
+		// AnnotationList declaredAnnotations =
+		// description.getDeclaredAnnotations();
+		MethodList<InDefinedShape> declaredMethods = description.getDeclaredMethods();
+		MethodList<InDefinedShape> sqlMethods = declaredMethods.filter(isAnnotatedWith(sql.class));
+		
+		net.bytebuddy.dynamic.DynamicType.Builder<Object> stub = new ByteBuddy()
+		.subclass(Object.class)
+		.implement(_class);
+		
+		for (InDefinedShape m : sqlMethods) {
+			
+			AnnotationList methodAnnotations = m.getDeclaredAnnotations();
+			// methodAnnotations.forEach(x ->
+			// System.out.println(x.getAnnotationType().getName()));
+			AnnotationDescription sqlAnnotation = methodAnnotations.stream()
+					.filter(x -> x.getAnnotationType().getName().equals("foo.bar.sql")).findFirst().get();
+			// sqlAnnotation.getAnnotationType().findVariable(symbol)
+			InDefinedShape valueMethod = sqlAnnotation.getAnnotationType().getDeclaredMethods().filter(named("value"))
+					.get(0);
+			String sqlQuery = (String) sqlAnnotation.getValue(valueMethod);
+
+			// TypeInferer.infereTypes(query);
+
+			// Prepare query (strip named params)
+
+			ParameterList<ParameterDescription.InDefinedShape> parameters = m.getParameters();
+			
+			ParseResult parseResult = ExpressionParser.parse(sqlQuery);
+			
+			if (parseResult.hasErrors) {
+				throw new RuntimeException(parseResult.errorMsg);
+			}
+
+			QueryMetadata metadata = JdbcMetadataInferer.infereMetadata(ExpressionParser.getTranslatedQuery(parseResult.result));
+			System.out.println(metadata);
+
+			 stub = stub.defineMethod(m).intercept(MethodDelegation.to(new QueryInterceptor(sqlQuery, metadata, parameters))); 
+
 		}
+		
+		// TODO: handle no sql methods...
+		return stub.make().load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
+		
+
 	}
+	
+	
 
 
+
+	/*includes, type-checks, multi-param queries, etc...*/
 	
 	
 	public static class QueryInterceptor {
@@ -175,19 +170,9 @@ public class App {
 			// it's not necessary to construct query dynamically
 			Class<?> query = 
 					new ByteBuddy().subclass(Object.class).implement(queryClass).method(named("result"))
-					.intercept(MethodDelegation.to(new QueryExecutorInterceptor(rawQuery, metadata, paramsMetadata, args))) // fixed
-																											// value
-																											// is
-																											// also
-																											// not
-																											// very
-																											// applicable
-																											// here,
-																											// except
-																											// query1
-					
-					
-					.make().load(getClass().getClassLoader(), ClassLoadingStrategy.Default.INJECTION).getLoaded(); // FIXME: why classloadingStrategy default doesn't work?
+					.intercept(MethodDelegation.to(new QueryExecutorInterceptor(rawQuery, metadata, paramsMetadata, args))) 
+					.make().load(getClass().getClassLoader(), ClassLoadingStrategy.Default.INJECTION).getLoaded(); 
+			// FIXME: why classloadingStrategy default doesn't work?
 			
 			try {
 				return query.newInstance();
@@ -230,25 +215,55 @@ public class App {
 			this.args = args;
 		}
 
-		public List<?> result(@AllArguments Object[] freeParams) { // fixme, plz, should have paramz actually, I mean no, result doesn't take arguments..., no it does! (sometimes
+		public List<?> result(@AllArguments Object[] freeParams) {
 			try {
 				Connection connection = JdbcMetadataInferer.ds.getConnection();
-				String preparedQuery = query.replaceAll("\\{[^\\}]*\\}", "?"); 
-				PreparedStatement ps = connection.prepareStatement(preparedQuery);
+				
+				ParseResult parseResult = ExpressionParser.parse(query);
+				
+			//	String preparedQuery = query.replaceAll("\\{[^\\}]*\\}", "?"); 
+				PreparedStatement ps = connection.prepareStatement(ExpressionParser.getTranslatedQuery(parseResult.result));
+				
+				List<VariableNode> variables = ExpressionParser.getVariables(parseResult.result); // btw, in order
+				
+				parameters.forEach((x) -> {
+//					x.getInternalName()
+					System.out.println(x.getInternalName());
+					System.out.println(x.getSourceCodeName());
+				});
+				
+				List<Tuple2<String, Integer>> params = parameters.stream().map( (x) -> new Tuple2<>(x.getName(), x.getIndex())).collect(Collectors.toList());
+				Map<String, Integer> parametersMap = 
+						parameters.stream().map( (x) -> new Tuple2<>(x.getName(), x.getIndex()))
+						.collect(Collectors.toMap((x) -> x. _1, (x) -> x._2));
+				
+				Set<String> variablesSet = variables.stream().map( (x) -> x.value).collect(Collectors.toSet());
+				Set<String> parametersSet = parametersMap.keySet();
+				
+				if (!variablesSet.equals(parametersSet)) {
+					throw new RuntimeException("Wrong parameters something.... query:`" + query + "`"); // FIXME: correct message ....
+				}
+				// FIXME: implement free variables
+				// FIXME: either add param annotation or require to enable compiler's preserve param names...
+				// -g // generate all debugging info
+				
+				
 				
 			//Map<String, String> valuesMap = new HashMap<>();
 				
 				// FIXME, FIXME, FIXME, assumed params in order...
 				for (int i = 0; i < parameters.size(); i++) {
+					
+					VariableNode var = variables.get(i);
 					// fuck, to string ....
 					int paramType = metadata.paramTypes[i];
 					
 					switch (paramType)  {
 					case 4: // int
-						ps.setInt(i+1, (int)args[i]);
+						ps.setInt(i+1, (int)args[parametersMap.get(var.value)]);
 						break;
 					case 12: // String
-						ps.setString(i+1, (String)args[i]);
+						ps.setString(i+1, (String)args[parametersMap.get(var.value)]);
 						break;
 					default:
 						throw new RuntimeException("not implemented");
@@ -271,7 +286,7 @@ public class App {
 					Object res[] = new Object[metadata.nResults];
 					for (int i = 0; i < metadata.nResults; i++) {
 						int resultType = metadata.resultTypes[i];
-						switch (resultType)  {
+						switch (resultType)  { // should make this easier somehow...
 						case 4: // int
 							res[i] = rs.getInt(i+1);
 							break;

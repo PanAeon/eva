@@ -66,9 +66,10 @@ public class JdbcMetadataInferer {
 
 	public static void setUpHsql() throws Exception {
 		Connection connection = ds.getConnection();
-		
-		connection.prepareStatement("create table users (id integer, firstName varchar(255), lastName varchar(255), city varchar(255), address varchar(255));").execute();
-		connection.prepareStatement("insert into users (id, firstName, lastName, city, address)" + "values (1, 'vasia', 'pupkin', 'horlovka', 'lenina 25');").execute();
+		connection.prepareStatement("create table organizations (id integer, name varchar(255), city varchar(255), address varchar(255), PRIMARY KEY (id));").execute();
+		connection.prepareStatement("insert into organizations (id, name, city, address)" + "values (1, 'org1', 'horlovka', 'pobedy 13');").execute();
+		connection.prepareStatement("create table users (id integer, organizationId integer, firstName varchar(255), lastName varchar(255), city varchar(255), address varchar(255), PRIMARY KEY (id), FOREIGN KEY (organizationId) REFERENCES Organizations(id));").execute();
+		connection.prepareStatement("insert into users (id, organizationId, firstName, lastName, city, address)" + "values (1, 1, 'vasia', 'pupkin', 'horlovka', 'lenina 25');").execute();
 		
 		connection.close();
 	}
