@@ -99,7 +99,13 @@ public class App {
 			// sqlAnnotation.getAnnotationType().findVariable(symbol)
 			InDefinedShape valueMethod = sqlAnnotation.getAnnotationType().getDeclaredMethods().filter(named("value"))
 					.get(0);
-			String sqlQuery = (String) sqlAnnotation.getValue(valueMethod);
+			String[] annotationValues = (String[]) sqlAnnotation.getValue(valueMethod);
+			
+			if (annotationValues.length == 0) {
+				throw new RuntimeException("empty sql annotation is not implemented");
+			}
+			
+			String sqlQuery = String.join("\n", annotationValues);
 
 			// TypeInferer.infereTypes(query);
 

@@ -3,7 +3,7 @@
     <groupId>foo.bar</groupId>
     <artifactId>eva</artifactId>
     <version>0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>eva</name>
     <url>http://maven.apache.org</url>
     <properties>
@@ -11,6 +11,13 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+
+     <modules>
+        <module>annotation-processor</module>
+        <module>eva-runtime</module>
+        <module>eva-example</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>net.bytebuddy</groupId>

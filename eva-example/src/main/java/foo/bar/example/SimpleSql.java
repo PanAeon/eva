@@ -1,20 +1,11 @@
-package foo.bar;
+package foo.bar.example;
 
+import javaslang.Tuple2;
+import javaslang.Tuple6;
+import foo.bar.sql;
 import foo.bar.queries.Query1;
-import javaslang.*;
 
-// TODO: unit tests from scratch ....
-// but there's mapping && includes ....
-// let's complete POC by the deadline
-
-// TODO: ok, doesn't need to actually type-check sql queries, make
-// sqlt and sql operators, similar to slick ones
-
-// see http://jdbi.org/
-
-public interface Genesys {
-	
-	
+public interface SimpleSql {
 	@sql("select * from users join organizations on users.organizationId=organizations.id where users.id = ${userId};")
 	Query1<Tuple2<String, String>> getUserWithOrg(int userId);
 	
@@ -29,7 +20,6 @@ public interface Genesys {
 	// unfortunately @Param("userId") int userId ... fuck
 	
 	void foo()/*{
-	   now what? 
-	   can I haz source files?
+	  yeah!
 	}*/; 
 }
