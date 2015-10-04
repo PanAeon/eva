@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import foo.bar.annotations.*;
+
 import org.apache.commons.lang3.text.StrSubstitutor;
 
 import foo.bar.expression.ExpressionNode;
@@ -54,7 +56,7 @@ public class App {
 	public void _main() throws Exception {
 		Class<?> myType = getTypeInfo(Genesys.class);
 		Genesys instance = (Genesys) myType.newInstance();
-		System.out.println(instance.getUserWithOrg(1).result());
+		System.out.println(instance.userWithOrgQ(1).result());
 		// Class<?> dynamicType = new ByteBuddy()
 		// .subclass(Object.class)
 		// .implement(Genesys.class)
@@ -95,7 +97,7 @@ public class App {
 			// methodAnnotations.forEach(x ->
 			// System.out.println(x.getAnnotationType().getName()));
 			AnnotationDescription sqlAnnotation = methodAnnotations.stream()
-					.filter(x -> x.getAnnotationType().getName().equals("foo.bar.sql")).findFirst().get();
+					.filter(x -> x.getAnnotationType().getName().equals("foo.bar.annotations.sql")).findFirst().get();
 			// sqlAnnotation.getAnnotationType().findVariable(symbol)
 			InDefinedShape valueMethod = sqlAnnotation.getAnnotationType().getDeclaredMethods().filter(named("value"))
 					.get(0);
@@ -126,7 +128,7 @@ public class App {
 
 		}
 		
-		// TODO: handle no sql methods...
+		// TODO: sort-out classloading strategy...
 		return stub.make().load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 		
 
@@ -163,10 +165,6 @@ public class App {
 			//Class<?> resultClass = getResultClass(metadata, parameters);
 
 			// FIXME: validate parameters
-			
-			// now only ...
-			
-			
 			
 			
 			
@@ -257,7 +255,6 @@ public class App {
 				
 			//Map<String, String> valuesMap = new HashMap<>();
 				
-				// FIXME, FIXME, FIXME, assumed params in order...
 				for (int i = 0; i < parameters.size(); i++) {
 					
 					VariableNode var = variables.get(i);
@@ -280,7 +277,7 @@ public class App {
 				//StrSubstitutor.replace(source, valueMap); wait, no point :(
 				
 				ResultSet rs = ps.executeQuery();
-				Class<?> resultClass = getResultClass(metadata, parameters);
+				Class<?> resultClass = getResultClass(metadata, parameters); // FIXME: return class && constructor or just constructor
 				Constructor<?> constructor = resultClass.getConstructors()[0]; // FIXME: tuple has just one constructor
 				
 				List<Object> results = new ArrayList<Object>();

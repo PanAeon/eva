@@ -1,6 +1,7 @@
 package foo.bar;
 
 import foo.bar.queries.Query1;
+import foo.bar.annotations.*;
 import javaslang.*;
 
 // TODO: unit tests from scratch ....
@@ -32,7 +33,7 @@ public interface Genesys {
 		"join organizations",
 		"on users.organizationId=organizations.id", 
 		"where users.id = ${userId}"})
-	Query1<Tuple2<String, String>> getUserWithOrg(int userId);
+	Query1<Tuple2<String, String>> userWithOrgQ(int userId);
 	
 	
 	@sql("select * from users where users.id = ${userId}")

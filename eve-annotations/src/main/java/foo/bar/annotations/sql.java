@@ -1,4 +1,4 @@
-package foo.bar;
+package foo.bar.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
