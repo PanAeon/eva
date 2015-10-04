@@ -32,7 +32,9 @@ import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic.Kind;
+import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
 
 import foo.bar.annotations.sql;
 
@@ -73,6 +75,18 @@ public class SqlPreProcessor extends AbstractProcessor {
 			 } else {
 				 ExecutableElement annotatedMethod = (ExecutableElement)annotatedElement;
 				 TypeElement classElement = (TypeElement)annotatedElement.getEnclosingElement();
+				 
+//				 try {
+//					//String pkg = elementUtils.getPackageOf(classElement).getQualifiedName().toString();
+//					 String foo = classElement.getQualifiedName().toString().replace(".", "/");
+//					 // looks like source path is not provided ....
+//					FileObject fo = processingEnv.getFiler().getResource(StandardLocation.SOURCE_PATH, "",  "src/main/java/foo/bar/example/SimpleSql.java");
+//					note(fo.getCharContent(true).toString());
+//				} catch (IOException e) {
+//					
+//					e.printStackTrace();
+//					note(e.getMessage());
+//				} 
 				 
 				 if (!annotatedClasses.containsKey(classElement)) {
 					 annotatedClasses.put(classElement, new HashSet<>());
