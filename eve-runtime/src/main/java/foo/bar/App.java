@@ -91,6 +91,8 @@ public class App {
 		.subclass(Object.class)
 		.implement(_class);
 		
+		
+		
 		for (InDefinedShape m : sqlMethods) {
 			
 			AnnotationList methodAnnotations = m.getDeclaredAnnotations();
@@ -128,18 +130,11 @@ public class App {
 
 		}
 		
-		// TODO: sort-out classloading strategy...
+		// FIXME: sort-out classloading strategy...
 		return stub.make().load(getClass().getClassLoader(), ClassLoadingStrategy.Default.WRAPPER).getLoaded();
 		
 
 	}
-	
-	
-
-
-
-	/*includes, type-checks, multi-param queries, etc...*/
-	
 	
 	public static class QueryInterceptor {
 		String query;
