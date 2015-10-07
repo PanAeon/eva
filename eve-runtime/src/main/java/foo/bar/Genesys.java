@@ -43,9 +43,10 @@ public interface Genesys {
 	@sql("select firstName, lastName from users ")
 	Query1<Tuple2<String, String>> userQ();
 	
-	// unfortunately @Param("userId") int userId ... fuck
+	// support?  @Param("userId") int userId ...
 	
 	void foo()/*{
+	  doesn't work without explict src path, then can use javac api to parse src
 	  yeah!
 	}*/; 
 }

@@ -112,6 +112,7 @@ public class JdbcMetadataInferer {
 	}
 }
 
+// FIXME: delete this shit and start anew
 class QueryMetadata {
 	int nParams; // java.sql.Types
 	int[] paramTypes;

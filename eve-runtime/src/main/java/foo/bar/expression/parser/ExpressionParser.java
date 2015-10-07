@@ -13,7 +13,8 @@ import foo.bar.expression.ExpressionNode;
 import foo.bar.expression.TextNode;
 import foo.bar.expression.VariableNode;
 
-// todo: cache, performance
+// todo: cache, performance ...
+// ??? should I use antlr for dsl parsing ??? parboiled seems sufficient
 public class ExpressionParser {
 	
 	
