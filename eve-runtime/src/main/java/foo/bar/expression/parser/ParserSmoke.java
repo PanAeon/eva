@@ -15,7 +15,7 @@ import foo.bar.expression.VariableNode;
 public class ParserSmoke {
 
 	public static void main(String[] args) {
-		String input = "select * from Users u where u.firstName=${firstName} and u.lastName = $lastName";
+		String input = "select * from Users u where u.firstName=${firstName(var,var,var)} and u.lastName = $lastName()";
 		ExpressionGrammar parser = Parboiled.createParser(ExpressionGrammar.class);
 		ParsingResult<?> result = new ReportingParseRunner(parser.Expression()).run(input);
 		

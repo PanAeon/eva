@@ -25,6 +25,7 @@ import foo.bar.expression.VariableNode;
  *
  */
 
+// TODO: tokenize whitespace, or add it here
 
 @BuildParseTree 
 public class ExpressionGrammar extends BaseParser<List<ExpressionNode>> {
@@ -43,12 +44,20 @@ public class ExpressionGrammar extends BaseParser<List<ExpressionNode>> {
 			); // TODO: not exactly java var definition....
 	}
 	
-	@SuppressNode
+	//@SuppressNode
 	public Rule Variable(Var<List<ExpressionNode>> variables) {
 		return FirstOf(
-				Sequence('$', SimpleVariableName(variables)),
-				Sequence("${", SimpleVariableName(variables), "}")
+				Sequence('$', SimpleVariableName(variables), Optional(Parameters())),
+				Sequence("${", SimpleVariableName(variables), Optional(Parameters()), "}")
 			   );
+	}
+	
+	//@SuppressNode
+	public Rule Parameters() { // simple csv list
+		return Sequence(
+				'(',
+					Optional(Sequence("var", ZeroOrMore(Sequence(",", "var")) )),
+				')');
 	}
 	
 	public Rule Expression() {
