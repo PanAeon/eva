@@ -47,17 +47,19 @@ public class ExpressionGrammar extends BaseParser<List<ExpressionNode>> {
 	//@SuppressNode
 	public Rule Variable(Var<List<ExpressionNode>> variables) {
 		return FirstOf(
-				Sequence('$', SimpleVariableName(variables), Optional(Parameters())),
-				Sequence("${", SimpleVariableName(variables), Optional(Parameters()), "}")
+				Sequence('$', FirstOf(Include(variables), SimpleVariableName(variables))),
+				Sequence("${", FirstOf(Include(variables),SimpleVariableName(variables)), "}")
 			   );
 	}
 	
+	public Rule Include(Var<List<ExpressionNode>> results) {
+		return Sequence(SimpleVariableName(results), '(', Optional(Parameters(results)), ')');
+	}
+	
 	//@SuppressNode
-	public Rule Parameters() { // simple csv list
-		return Sequence(
-				'(',
-					Optional(Sequence("var", ZeroOrMore(Sequence(",", "var")) )),
-				')');
+	public Rule Parameters(Var<List<ExpressionNode>> params) { // simple csv list
+		Var<List<ExpressionNode>> variables = new Var<>(new ArrayList<>()); // FIXME: push params upstream
+		return Optional(Sequence(SimpleVariableName(variables), ZeroOrMore(Sequence(",", SimpleVariableName(variables))) ));
 	}
 	
 	public Rule Expression() {

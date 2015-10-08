@@ -16,6 +16,8 @@ import org.hsqldb.Server;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import foo.bar.internal.QueryMetadata;
+
 public class JdbcMetadataInferer {
 
 	public static DataSource ds;
@@ -112,26 +114,6 @@ public class JdbcMetadataInferer {
 	}
 }
 
-// FIXME: delete this shit and start anew
-class QueryMetadata {
-	int nParams; // java.sql.Types
-	int[] paramTypes;
-	String[] paramClassNames;
 
-	int nResults;
-	int[] resultTypes;
-	String[] resultClassNames;
-	String[] resultNames;
-	String[] tableNames;
 
-	@Override
-	public String toString() {
-		return  ToStringBuilder.reflectionToString(this);
-//		return "QueryMetadata(" + "\nnParams: " + nParams + "\nparamTypes: " + Arrays.toString(paramTypes)
-//		        + "\nparamClasses: " + Arrays.toString(paramClassNames)
-//				+ "\nnResults: " + nResults + "\nresultTypes: " + Arrays.toString(resultTypes) + "\nresultClassNames: "
-//				+ Arrays.toString(resultClassNames) + "\nresultNames: "
-//				+ Arrays.toString(resultNames) + "\ntableNames: " + Arrays.toString(tableNames) + "\n)";
-	}
 
-}

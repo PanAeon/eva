@@ -22,6 +22,7 @@ import foo.bar.expression.TextNode;
 import foo.bar.expression.VariableNode;
 import foo.bar.expression.parser.ExpressionParser;
 import foo.bar.expression.parser.ParseResult;
+import foo.bar.internal.QueryMetadata;
 import foo.bar.queries.Query1;
 import javaslang.*;
 import net.bytebuddy.ByteBuddy;
