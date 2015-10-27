@@ -9,6 +9,7 @@ import org.parboiled.support.ParseTreeUtils;
 import org.parboiled.support.ParsingResult;
 
 import foo.bar.expression.ExpressionNode;
+import foo.bar.expression.IncludeNode;
 import foo.bar.expression.TextNode;
 import foo.bar.expression.VariableNode;
 
@@ -51,6 +52,9 @@ public class ParserSmoke {
 				TextNode node = (TextNode)x;
 				sb.append(node.value);
 				
+			} else if (x instanceof IncludeNode) {
+			  IncludeNode node = (IncludeNode) x;
+			  sb.append("?");
 			}
 		}
 		System.out.println(sb.toString());
