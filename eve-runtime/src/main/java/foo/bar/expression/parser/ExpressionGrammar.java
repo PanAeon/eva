@@ -26,7 +26,8 @@ import foo.bar.expression.VariableNode;
  *
  */
 
-// TODO: tokenize whitespace, or add it here
+// TODO: tokenize whitespace, or add it here, see notes about ws in parboiled
+// TODO: use push/stack as appropriate
 
 @BuildParseTree 
 public class ExpressionGrammar extends BaseParser<List<ExpressionNode>> {

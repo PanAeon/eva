@@ -2,6 +2,7 @@ package foo.bar.expression.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.parboiled.Parboiled;
 import org.parboiled.errors.ParseError;
@@ -10,8 +11,11 @@ import org.parboiled.support.ParseTreeUtils;
 import org.parboiled.support.ParsingResult;
 
 import foo.bar.expression.ExpressionNode;
+import foo.bar.expression.IncludeNode;
 import foo.bar.expression.TextNode;
 import foo.bar.expression.VariableNode;
+import foo.bar.internal.InternalQuery;
+import foo.bar.internal.QueryEnvironment;
 
 // todo: cache, performance ...
 // ??? should I use antlr for dsl parsing ??? parboiled seems sufficient
@@ -62,7 +66,8 @@ public class ExpressionParser {
 		return parseResult; // TODO: maybe just return parboiled ParsingResult ???
 	}
 	
-	public static String getTranslatedQuery(List<ExpressionNode> xs) { // TODO: move to utils
+	// FIXME: should take context, and resolve includes, move to separate class / package
+	public static String getTranslatedQuery(List<ExpressionNode> xs) { 
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -73,21 +78,46 @@ public class ExpressionParser {
 				TextNode node = (TextNode)x;
 				sb.append(node.value);
 				
+			} else if (x instanceof IncludeNode) {
+			  throw new RuntimeException("Not implemented!");
 			}
 		}
 		
 		return sb.toString();
 	}
 	
+	// FIXME: move to a separate module ???
+	public static String getTranslatedQuery(List<ExpressionNode> xs, QueryEnvironment env) {
+	  StringBuilder sb = new StringBuilder();
+	  
+	  for (ExpressionNode x : xs) {
+      if (x instanceof VariableNode) {
+        VariableNode node = (VariableNode)x;
+        InternalQuery subQuery = env.resolve(node.value);
+        if ( subQuery != null) {
+          sb.append(" (" + subQuery.getPreCompiledQuery() + ") ");
+        } else {
+          sb.append("?");
+        }
+      } else if (x instanceof TextNode) {
+        TextNode node = (TextNode)x;
+        sb.append(node.value);
+        
+      } else if (x instanceof IncludeNode) {
+        IncludeNode node = (IncludeNode)x;
+        InternalQuery subQuery = env.resolve(node.value.value);
+        sb.append("(" + subQuery.getPreCompiledQuery() + ")");
+      }
+    }
+	  
+	  return sb.toString();
+	}
+	
 	public static List<VariableNode> getVariables(List<ExpressionNode> xs) {
-		List<VariableNode> result = new ArrayList<>();
-		
-		for (ExpressionNode x : xs) {
-			if (x instanceof VariableNode) {
-				result.add((VariableNode)x);
-			} 
-		}
-		
-		return result;
+	  return xs.stream().filter(x -> x instanceof VariableNode).map(x -> (VariableNode)x).collect(Collectors.toList());
+	}
+	
+	public static List<IncludeNode> getIncludes(List<ExpressionNode> xs) {
+	  return xs.stream().filter(x -> x instanceof IncludeNode).map(x -> (IncludeNode)x).collect(Collectors.toList());
 	}
 }

@@ -49,6 +49,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 // TODO: batch statements
 //todo: support positional params (?) do we need them?
 // TODO: support subqueries, ...
+// Actually I had  a list somewhere ....
 public class App {
 	public static void main(String[] args) throws Exception {
 		new App()._main();
@@ -92,7 +93,10 @@ public class App {
 		.subclass(Object.class)
 		.implement(_class);
 		
-		
+		// well we have first to make first pass, 
+		// make some sort of query dependency graph 
+		// and then actually go the second time and
+		// resolve all subqueries
 		
 		for (InDefinedShape m : sqlMethods) {
 			

@@ -4,6 +4,8 @@ import foo.bar.queries.Query1;
 import foo.bar.annotations.*;
 import javaslang.*;
 
+
+
 // TODO: unit tests from scratch ....
 // but there's mapping && includes ....
 // let's complete POC by the deadline
@@ -25,7 +27,7 @@ import javaslang.*;
  */
 
 public interface Genesys {
-	
+ 
 	
 	@sql({
 		"select * from",
