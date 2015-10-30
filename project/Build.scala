@@ -26,18 +26,12 @@ object EveBuild extends Build {
     .settings(eveannotationProcessorSettings: _*)
     .dependsOn(annotationsProject)
     .settings(exportJars := true)
-    .settings(crossPaths := false)
-    .settings(autoScalaLibrary := false)
-    .settings(EclipseKeys.projectFlavor := EclipseProjectFlavor.Java)
 
   lazy val runtimeProject = Project(id = "eve-runtime", base = file("eve-runtime"))
     .settings(everuntimeSettings: _*)
     .dependsOn(annotationsProject)
     .dependsOn(annotationProcessorProject)
     .settings(libraryDependencies ++= eveRuntimeDependencies)
-    .settings(crossPaths := false)
-    .settings(autoScalaLibrary := false)
-    .settings(EclipseKeys.projectFlavor := EclipseProjectFlavor.Java)
 
    lazy val exampleProject = Project(id = "eve-example", base = file("eve-example"))
     .settings(eveExampleSettings: _*)
@@ -45,7 +39,4 @@ object EveBuild extends Build {
     // .settings(javacOptions ++= List("-processor", "foo.bar.annotations.processor.SqlPreProcessor", "-proc:only", "-XprintRounds"))
     //.settings((fork in (Compile, run)) := true)
     .dependsOn(annotationsProject, annotationProcessorProject, runtimeProject)
-    .settings(crossPaths := false)
-    .settings(autoScalaLibrary := false)
-    .settings(EclipseKeys.projectFlavor := EclipseProjectFlavor.Java)
 }
