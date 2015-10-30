@@ -1,5 +1,5 @@
 package foo.bar.expression.parser;
-
+/*
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import foo.bar.expression.ExpressionNode;
 import foo.bar.expression.IncludeNode;
 import foo.bar.expression.TextNode;
 import foo.bar.expression.VariableNode;
-
+*/
 /**
  * 
     Expression <- (Text | Variable)*
@@ -28,7 +28,7 @@ import foo.bar.expression.VariableNode;
 
 // TODO: tokenize whitespace, or add it here, see notes about ws in parboiled
 // TODO: use push/stack as appropriate
-
+/*
 @BuildParseTree 
 public class ExpressionGrammar extends BaseParser<List<ExpressionNode>> {
 	
@@ -89,7 +89,7 @@ public class ExpressionGrammar extends BaseParser<List<ExpressionNode>> {
 
 }
 
-
+*/
 
 
 

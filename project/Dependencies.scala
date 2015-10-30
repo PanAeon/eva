@@ -27,7 +27,8 @@ object Dependencies {
 
   val commonsLang3 = "org.apache.commons" % "commons-lang3" % "3.4"  withSources() withJavadoc()
 
-  val parboiled = "org.parboiled" % "parboiled-java" % "1.1.7"  withSources() withJavadoc()
+  val parboiled = "org.parboiled" %% "parboiled-scala" % "1.1.7"  withSources() withJavadoc()
+  
 
   lazy val eveRuntimeDependencies = compile(bytebuddy, javaslang, 
       hsqldb, hikariCP, jsqlparser, commonsLang3, parboiled) ++

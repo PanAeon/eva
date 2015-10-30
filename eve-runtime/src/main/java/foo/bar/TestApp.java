@@ -17,10 +17,10 @@ import foo.bar.annotations.*;
 
 import org.apache.commons.lang3.text.StrSubstitutor;
 
-import foo.bar.expression.ExpressionNode;
-import foo.bar.expression.TextNode;
-import foo.bar.expression.VariableNode;
-import foo.bar.expression.parser.ExpressionParser;
+//import foo.bar.expression.ExpressionNode;
+//import foo.bar.expression.TextNode;
+//import foo.bar.expression.VariableNode;
+//import foo.bar.expression.parser.ExpressionParser;
 import foo.bar.expression.parser.ParseResult;
 import foo.bar.internal.QueryMetadata;
 import foo.bar.queries.Query1;
@@ -50,9 +50,9 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 //todo: support positional params (?) do we need them?
 // TODO: support subqueries, ...
 // Actually I had  a list somewhere ....
-public class App {
+public class TestApp {
 	public static void main(String[] args) throws Exception {
-		new App()._main();
+		new TestApp()._main();
 	}
 	
 	public void _main() throws Exception {
@@ -122,13 +122,15 @@ public class App {
 
 			ParameterList<ParameterDescription.InDefinedShape> parameters = m.getParameters();
 			
-			ParseResult parseResult = ExpressionParser.parse(sqlQuery);
+			ParseResult parseResult = null;//ExpressionParser.parse(sqlQuery);
 			
 			if (parseResult.hasErrors) {
 				throw new RuntimeException(parseResult.errorMsg);
 			}
 
-			QueryMetadata metadata = JdbcMetadataInferer.infereMetadata(ExpressionParser.getTranslatedQuery(parseResult.result));
+			// FIXME: actual metadata is below:
+			//QueryMetadata metadata = JdbcMetadataInferer.infereMetadata(ExpressionParser.getTranslatedQuery(parseResult.result));
+			QueryMetadata metadata = null;
 			System.out.println(metadata);
 
 			 stub = stub.defineMethod(m).intercept(MethodDelegation.to(new QueryInterceptor(sqlQuery, metadata, parameters))); 
@@ -165,13 +167,9 @@ public class App {
 			//Class<?> resultClass = getResultClass(metadata, parameters);
 
 			// FIXME: validate parameters
-			
-			
-			
-			//String preparedQuery = rawQuery.replaceAll("\\{[^\\}]*\\}", "1"); 
-																				
+																			
 
-			// it's not necessary to construct query dynamically
+			// FIXME: it's not necessary to construct query dynamically
 			Class<?> query = 
 					new ByteBuddy().subclass(Object.class).implement(queryClass).method(named("result"))
 					.intercept(MethodDelegation.to(new QueryExecutorInterceptor(rawQuery, metadata, paramsMetadata, args))) 
@@ -218,7 +216,11 @@ public class App {
 			this.parameters = parameters;
 			this.args = args;
 		}
-
+		
+		public List<?> result(@AllArguments Object[] freeParams) {
+		  throw new RuntimeException("not implemented");
+		}
+    /*
 		public List<?> result(@AllArguments Object[] freeParams) {
 			try {
 				Connection connection = JdbcMetadataInferer.ds.getConnection();
@@ -309,7 +311,7 @@ public class App {
 				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-		}
+		} */
 		
 		// select between Tuple0 ... TupleN ... for Now, also need Void type
 		private Class<?> getResultClass(QueryMetadata metadata,
