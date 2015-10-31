@@ -4,7 +4,8 @@ import org.parboiled.scala._
 import org.parboiled.errors.{ErrorUtils, ParsingException}
 import ExpressionAST._
 
-class ExpressionGrammar extends Parser {
+// TODO: tokenize whitespace, or add it here, see notes about ws in parboiled
+class ExpressionParser extends Parser {
   def Expression : Rule1[List[ExpressionNode]] = rule {
     oneOrMore(Text | Term) ~ EOI
   }
@@ -33,9 +34,18 @@ class ExpressionGrammar extends Parser {
     VariableName ~> (identity)  ~ Parameters ~~> ApplyNode
   }
   
-  def VarOrApply  = rule { Variable | ApplyDef }
+  def VarOrApply  = rule { ApplyDef | Variable }
   
   def VariableName = rule {
     ("a" - "z" | "A" - "Z" | "_") ~ zeroOrMore("0" - "9" | "a" - "z" | "A" - "Z" | "_")
+  }
+  
+  def parseExpression(sql: String): List[ExpressionNode] = {
+    val parsingResult = ReportingParseRunner(Expression).run(sql)
+    parsingResult.result match {
+      case Some(astRoot) => astRoot
+      case None => throw new ParsingException("Invalid SQL Expression source:\n" +
+              ErrorUtils.printParseErrors(parsingResult)) 
+    }
   }
 }
