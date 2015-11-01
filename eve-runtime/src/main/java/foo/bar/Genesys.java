@@ -28,6 +28,11 @@ import javaslang.*;
 
 public interface Genesys {
  
+  
+  @sql({
+    "select * from users"
+  })
+  Query1<Tuple2<String, String>> allUsers();
 	
 	@sql({
 		"select * from",
@@ -36,6 +41,17 @@ public interface Genesys {
 		"on users.organizationId=organizations.id", 
 		"where users.id = ${userId}"})
 	Query1<Tuple2<String, String>> userWithOrgQ(int userId);
+	
+	@sql({
+	  "select * from $allUsers where age > $age"
+	})
+	Query1<Tuple2<String, String>> usersOlderThan(int age);
+	
+	@sql({
+    "select * from $usersOlderThan(age)",
+    "join organizations on organizationId = organizations.id" // notice users.organizationId will not work!
+  })
+  Query1<Tuple2<String, String>> usersOlderThanAgeWithOrganizations(int age);
 	
 	
 	@sql("select * from users where users.id = ${userId}")

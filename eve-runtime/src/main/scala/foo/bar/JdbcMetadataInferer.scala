@@ -56,8 +56,12 @@ object JdbcMetadataInferer {
     withConnection { connection =>
       connection.prepareStatement("create table organizations (id integer, name varchar(255), city varchar(255), address varchar(255), PRIMARY KEY (id));").execute();
       connection.prepareStatement("insert into organizations (id, name, city, address)" + "values (1, 'org1', 'horlovka', 'pobedy 13');").execute();
-      connection.prepareStatement("create table users (id integer, organizationId integer, firstName varchar(255), lastName varchar(255), city varchar(255), address varchar(255), PRIMARY KEY (id), FOREIGN KEY (organizationId) REFERENCES Organizations(id));").execute();
-      connection.prepareStatement("insert into users (id, organizationId, firstName, lastName, city, address)" + "values (1, 1, 'vasia', 'pupkin', 'horlovka', 'lenina 25');").execute();
+      connection.prepareStatement("create table users (id integer, organizationId integer, firstName varchar(255), lastName varchar(255), age integer, city varchar(255), address varchar(255), PRIMARY KEY (id), FOREIGN KEY (organizationId) REFERENCES Organizations(id));").execute();
+      connection.prepareStatement("insert into users (id, organizationId, firstName, lastName, age, city, address)" + "values (1, 1, 'vasia', 'pupkin', 32, 'horlovka', 'lenina 25');").execute();
+      connection.prepareStatement("insert into users (id, organizationId, firstName, lastName, age, city, address)" + "values (2, 1, 'petia', 'piatochkin', 12, 'horlovka', 'lenina 25');").execute();
+      connection.prepareStatement("insert into users (id, organizationId, firstName, lastName, age, city, address)" + "values (3, 1, 'sasha', 'gray', 24, 'horlovka', 'lenina 25');").execute();
+      connection.prepareStatement("insert into users (id, organizationId, firstName, lastName, age, city, address)" + "values (4, 1, 'dasha', 'rasputina', 35, 'horlovka', 'lenina 25');").execute();
+      connection.prepareStatement("insert into users (id, organizationId, firstName, lastName, age, city, address)" + "values (5, 1, 'lena', 'golovach', 24, 'horlovka', 'lenina 25');").execute();
     }
   }
 
