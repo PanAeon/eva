@@ -1,0 +1,28 @@
+
+My TODO list:
+  ☐ Finish Annotation Processor
+  ☐ Subqueries (basic)
+  ☐ Mapping (basic)
+  ☐ Mapping (code generation)
+  ☐ Runtime typecheck + implement free params
+  ☐ Use-cases + some tests
+  ☐ CRUD template
+  ☐ Query composition rules
+  ☐ batching
+  ☐ Optional / Nullable
+  ☐ ANSI parser
+  ☐ Error handling (thorough)
+  ☐ Investigate functional interfaces (+https://github.com/TrigerSoft/jaque)
+  ☐ SQL transforms / inlining
+  ☐ Annotation Mapping ?
+  ☐ MySql parser
+  ☐ Mulit-db support (investigate)
+  ☐ tx, sessions
+  ☐ async
+  ☐ investigate caching
+  ☐ investigate optimistic locking
+  ☐ literal params for subqueries
+  ☐ add-hoc query methods
+  ☐ integration tests
+  ☐ streams
+  ☐ 

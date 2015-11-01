@@ -1,6 +1,7 @@
-package foo.bar.queries;
 
-import java.util.List;
+package foo.bar.queries
+
+import java.util.{List => JList};
 
 // @FunctionalInterface, maybe
 // like in:
@@ -21,8 +22,8 @@ import java.util.List;
     }
 }
  */
-public interface Query1<R> {
-	public List<R> result(); // Actually Seq....
+trait Query1[R] {
+	def  result() : JList[R]; // Actually Seq....
 	
 	// public R single(); // or null
 	// public R singleOption();
