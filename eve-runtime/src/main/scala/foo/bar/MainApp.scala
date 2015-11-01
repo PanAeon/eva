@@ -23,7 +23,9 @@ import foo.bar.query.{DeclaredParameter, DeclaredResultType, QueryDetails, Query
 object MainApp extends App {
   val myType = getTypeInfo(classOf[Genesys])
   val instance : Genesys = myType.newInstance()
+  println("-" * 10 + " Results: " + ("-" * 10))
   System.out.println(instance.usersOlderThanAgeWithOrganizations(10).result().asScala.mkString("\n"));
+  println("-" * 30 )
   
   def getTypeInfo[T]( _class: Class[T]): Class[T] = {
     val description = new TypeDescription.ForLoadedType(_class)
@@ -63,6 +65,7 @@ object MainApp extends App {
     
     val environment = QueryEnvironment(queryEnvironment.env.mapValues{q => 
       val translated = ExpressionUtils.translateQuery(q.ast, queryEnvironment)
+      println(s"TranslatedQuery `${q.method.getName}`: \n $translated \n ")
       val jdbcMetadata =  JdbcMetadataInferer.infereMetadata(translated)
       val argumentsInOrder = ExpressionUtils.translateQueryArguments(q.ast, queryEnvironment)
       q.copy(
